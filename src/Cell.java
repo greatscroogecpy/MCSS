@@ -3,7 +3,7 @@ public class Cell {
     private Daisy daisy;
 
     public Cell() {
-        this.temperature = 0.0;
+        this.temperature = Params.DEFAULT_CELL_TEMPERATURE;
         this.daisy = null;
     }
 

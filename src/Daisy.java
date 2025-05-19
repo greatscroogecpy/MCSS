@@ -1,8 +1,5 @@
+// All files are in the default package
 public class Daisy {
-    private static final int MAX_AGE = 25; // set the max age of daisy
-    public static final double WHITE_ALBEDO = 0.75;
-    public static final double BLACK_ALBEDO = 0.25;
-
     public enum Color {
         WHITE, BLACK
     }
@@ -28,7 +25,10 @@ public class Daisy {
     }
 
     public boolean isDead() {
-        return this.age > MAX_AGE;
+        return this.age > Params.DAISY_MAX_AGE;
     }
-
+    
+    public double getAlbedo() {
+        return color == Color.WHITE ? Params.WHITE_DAISY_ALBEDO : Params.BLACK_DAISY_ALBEDO;
+    }
 } 
