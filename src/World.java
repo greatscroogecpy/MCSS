@@ -17,6 +17,11 @@ public class World {
 
     // 随机初始化 Daisy 分布
     public void worldInit(){
+        // 确保所有单元格温度为0
+        for (int i = 0; i < size; i++)
+            for (int j = 0; j < size; j++)
+                grid[i][j].setTemperature(0.0);
+                
         int totalPatchs = size*size;
         int whiteCount=(int) (totalPatchs* Params.START_WHITE_RATIO);
         int blackCount=(int) (totalPatchs* Params.START_BLACK_RATIO);
@@ -37,20 +42,42 @@ public class World {
                 switch (state) {
                     case "W":
                         grid[j][i] = new Patch(new Daisy(Daisy.Color.WHITE,rand.nextInt(Params.DAISY_MAX_AGE)));
+                        grid[j][i].setTemperature(0.0); // 确保新创建的单元格温度为0
                         break;
                     case "B":
                         grid[j][i] = new Patch(new Daisy(Daisy.Color.BLACK,rand.nextInt(Params.DAISY_MAX_AGE)));
+                        grid[j][i].setTemperature(0.0); // 确保新创建的单元格温度为0
                         break;
                     case "E":
                         grid[j][i] = new Patch(); // 空地
+                        grid[j][i].setTemperature(0.0); // 确保新创建的单元格温度为0
                         break;
                 }
             }
         }
 
+        // 打印诊断信息
+        System.out.println("初始化完成前:");
+        System.out.println("白雏菊反照率: " + Params.WHITE_DAISY_ALBEDO);
+        System.out.println("黑雏菊反照率: " + Params.BLACK_DAISY_ALBEDO);
+        System.out.println("地表反照率: " + Params.SURFACE_ALBEDO);
+        System.out.println("太阳光度: " + Params.SOLAR_LUMINOSITY);
+        System.out.println("随机取样的初始温度: " + grid[0][0].getTemperature());
+
         // 初始化完毕后更新每个 Patch 的温度
         updateTemperatures();
-
+        
+        // 打印更新后的温度
+        double totalTemp = 0;
+        int count = 0;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                totalTemp += grid[i][j].getTemperature();
+                count++;
+            }
+        }
+        System.out.println("初始化后平均温度: " + (totalTemp / count));
+        System.out.println("随机取样的更新后温度: " + grid[0][0].getTemperature());
     }
 
     // 重新计算每个 Patch 的温度
