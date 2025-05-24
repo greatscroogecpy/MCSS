@@ -6,8 +6,7 @@ public class Patch {
     private double temperature;
     private Daisy daisy;
     private double surfaceAlbedo=0.4;
-    private final double diffusionRatio = 0.5;
-    Random rand = new Random();
+    private static final Random rand = new Random();
 
 
 
@@ -60,16 +59,6 @@ public class Patch {
         }
 
         this.temperature = (this.temperature + localHeating) / 2;
-    }
-
-    public void diffuse(List<Patch> neighbors) {
-        double oldTemp = this.temperature;
-        this.temperature *= (1 - diffusionRatio); // 保留部分温度
-
-        double share = (oldTemp * diffusionRatio) / neighbors.size();
-        for (Patch neighbor : neighbors) {
-            neighbor.temperature += share; // 向每个邻居扩散等份温度
-        }
     }
 
     public void checkSurvivability(List<Patch> neighbours){

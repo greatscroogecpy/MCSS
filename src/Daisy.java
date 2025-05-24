@@ -2,7 +2,8 @@ import java.util.Random;
 
 // All files are in the default package
 public class Daisy {
-    public void setAge(int i) {
+    public void setAge(int age) {
+        this.age = age;
     }
 
     public enum Color {
@@ -33,6 +34,6 @@ public class Daisy {
     }
 
     public boolean isDead() {
-        return this.age > Params.DAISY_MAX_AGE;
+        return this.age >= Params.DAISY_MAX_AGE;
     }
 } 

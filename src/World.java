@@ -5,7 +5,7 @@ public class World {
     private final int size;
     private final Patch[][] grid;
     private final double diffusionRatio = 0.5;
-    Random rand = new Random();
+    private static final Random rand = new Random();
 
     public World() {
         this.size = Params.WORLD_SIZE;
@@ -63,16 +63,40 @@ public class World {
     }
 
     public void diffuseTemperature() {
-        // 为了防止边扩散边修改，先复制旧温度
+        double[][] newTemps = new double[size][size];
+
         for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++){
-                Patch patch = this.grid[i][j];
-                patch.diffuse(this.getNeighbors(i,j));
+            for (int j = 0; j < size; j++) {
+                double oldTemp = grid[i][j].getTemperature();
+                double retained = oldTemp * (1 - diffusionRatio);
+                
+                // 自己保留部分
+                newTemps[i][j] += retained;
+                
+                // 获取邻居并计算分享温度
+                List<Patch> neighbors = getNeighbors(i, j);
+                double shared = oldTemp * diffusionRatio / neighbors.size();
+                
+                // 将共享部分扩散到邻居
+                for (int dx = -1; dx <= 1; dx++) {
+                    for (int dy = -1; dy <= 1; dy++) {
+                        if (dx == 0 && dy == 0) continue;
+                        int ni = i + dx, nj = j + dy;
+                        if (ni >= 0 && nj >= 0 && ni < size && nj < size) {
+                            newTemps[ni][nj] += shared;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 统一更新所有单元格的温度
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                grid[i][j].setTemperature(newTemps[i][j]);
             }
         }
     }
-
-
 
     public void checkAllDaisySurvivals() {
         for(int i = 0; i < size; i++){
@@ -82,41 +106,6 @@ public class World {
             }
         }
     }
-
-
-//    public void diffuseTemperature() {
-//        double[][] newTemps = new double[size][size];
-//
-//        for (int i = 0; i < size; i++) {
-//            for (int j = 0; j < size; j++) {
-//                double oldTemp = grid[i][j].getTemperature();
-//                double retained = oldTemp * (1 - diffusionRatio);
-//                double shared = oldTemp * diffusionRatio / 8.0;
-//
-//                // 自己保留部分
-//                newTemps[i][j] += retained;
-//
-//                // 将共享部分扩散到邻居
-//                for (int dx = -1; dx <= 1; dx++) {
-//                    for (int dy = -1; dy <= 1; dy++) {
-//                        if (dx == 0 && dy == 0) continue;
-//                        int ni = i + dx, nj = j + dy;
-//                        if (ni >= 0 && nj >= 0 && ni < size && nj < size) {
-//                            newTemps[ni][nj] += shared;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//
-//        // 第二步：统一写回 temp（统一更新）
-//        for (int i = 0; i < size; i++) {
-//            for (int j = 0; j < size; j++) {
-//                grid[i][j].setTemperature(newTemps[i][j]);
-//            }
-//        }
-//    }
-
 
     private List<Patch> getNeighbors(int x, int y) {
         List<Patch> neighbors = new ArrayList<>();
@@ -132,12 +121,8 @@ public class World {
         return neighbors;
     }
 
-
-
-
     public int getSize() {
         return size;
-
     }
 
     public Patch[][] getGrid() {
