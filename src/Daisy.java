@@ -6,6 +6,8 @@ public class Daisy {
         this.age = age;
     }
 
+    public int getAge() { return age;}
+
     public enum Color {
         WHITE, BLACK
     }

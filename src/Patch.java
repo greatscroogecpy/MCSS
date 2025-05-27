@@ -70,31 +70,32 @@ public class Patch {
 
     public void checkSurvivability(List<Patch> neighbours){
         if (this.daisy != null) {
+            // First increment age
             this.daisy.incrementAge();
-            if (this.daisy.isDead()){
+
+            // Check for death
+            if (this.daisy.isDead()) {
                 this.daisy = null;
-            } else {
-                // calculate the possibility of seeding
+            }
+            // Only allow reproduction for Daisy older than 1 tick
+            else if (this.daisy.getAge() >= 1) {
                 double seedThreshold = 0.1457 * this.temperature - 0.0032 * Math.pow(this.temperature, 2) - 0.6443;
 
-                // check if any neighbour is empty
-                List<Patch> openNeighbours = new ArrayList<>();
+                List<Patch> freeNeighbours = new ArrayList<>();
                 for(Patch neighbour : neighbours){
                     if(neighbour.daisy == null){
-                        openNeighbours.add(neighbour);
+                        freeNeighbours.add(neighbour);
                     }
                 }
 
-                // choose one open neighbour randomly and sprout a new daisy
-                double possibility = Math.random();
-                if(!openNeighbours.isEmpty() && possibility < seedThreshold){
-
-                    int index = rand.nextInt(openNeighbours.size());
-                    openNeighbours.get(index).daisy = new Daisy(this.daisy.getColor());
+                if(!freeNeighbours.isEmpty() && Math.random() < seedThreshold){
+                    Patch chosen = freeNeighbours.get(rand.nextInt(freeNeighbours.size()));
+                    chosen.daisy = new Daisy(this.daisy.getColor()); // default age = 0
                 }
             }
         }
     }
+
 
     public void diffuse(List<Patch> neighbors){
         double oldTemp = this.temperature;

@@ -28,7 +28,7 @@ public class Params {
     public static double DEFAULT_CELL_TEMPERATURE = 0.0;
     public static double SURFACE_ALBEDO = 0.40;
 
-    public static LUMINOSITY_SCENARIO SCENARIO =LUMINOSITY_SCENARIO.RAMP_UP_RAMP_DOWN;
+    public static LUMINOSITY_SCENARIO SCENARIO =LUMINOSITY_SCENARIO.LOW_SOLAR_LUMINOSITY;
 
 
     // Simulation parameters
@@ -36,13 +36,4 @@ public class Params {
     public static int MAX_SIMULATION_STEPS = 1000;
     public static double DIFFUSION_RATIO = 0.5;
 
-    // Temperature calculation parameters
-    // These can be added based on the temperature calculation logic
-    public static double STEFAN_BOLTZMANN = 5.67E-8; // Stefan-Boltzmann constant if needed
-
-    // Daisy growth parameters
-    // These can be customized for the simulation
-    public static double OPTIMAL_TEMPERATURE = 22.5; // Optimal temperature for daisy growth
-    public static final double TEMPERATURE_RANGE = 17.5;
-    public static double GROWTH_RATE_COEFFICIENT = 0.1; // Coefficient for growth rate calculation
 } 

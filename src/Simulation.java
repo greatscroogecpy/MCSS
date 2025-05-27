@@ -27,8 +27,7 @@ public class Simulation {
         System.out.println("  总雏菊数量: " + (logger.getWhiteCount() + logger.getBlackCount()));
 
         // Create CSV filename based on parameters
-        String csvFilename = String.format("%.2f_%.2f_%.2f_%s.csv",
-                Params.SOLAR_LUMINOSITY,
+        String csvFilename = String.format("%.2f_%.2f_%s.csv",
                 Params.START_WHITE_RATIO,
                 Params.START_BLACK_RATIO,
                 Params.SCENARIO.name());
