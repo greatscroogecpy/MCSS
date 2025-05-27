@@ -13,51 +13,52 @@ public class Simulation {
         System.out.println("  太阳光度: " + Params.SOLAR_LUMINOSITY);
         System.out.println("  白雏菊初始比例: " + Params.START_WHITE_RATIO);
         System.out.println("  黑雏菊初始比例: " + Params.START_BLACK_RATIO);
-        
+
         World world = new World();
         world.worldInit();
 
         Logger logger = new Logger(world);
-        
+
         // 记录第0步的初始状态
         System.out.println("初始状态 (第0步):");
         System.out.println("  平均温度: " + logger.getAverageTemperature());
         System.out.println("  白雏菊数量: " + logger.getWhiteCount());
         System.out.println("  黑雏菊数量: " + logger.getBlackCount());
         System.out.println("  总雏菊数量: " + (logger.getWhiteCount() + logger.getBlackCount()));
-        
+
         // Create CSV filename based on parameters
-        String csvFilename = String.format("%.2f_%.2f_%.2f.csv", 
-                              Params.SOLAR_LUMINOSITY, 
-                              Params.START_WHITE_RATIO, 
-                              Params.START_BLACK_RATIO);
-        
+        String csvFilename = String.format("%.2f_%.2f_%.2f_%s.csv",
+                Params.SOLAR_LUMINOSITY,
+                Params.START_WHITE_RATIO,
+                Params.START_BLACK_RATIO,
+                Params.SCENARIO.name());
+
         // Create CSV file and write header
         try (FileWriter csvWriter = new FileWriter(csvFilename)) {
             // Write header
             csvWriter.append("Tick,AverageTemperature,WhiteDaisyCount,BlackDaisyCount,TotalDaisyCount,SolarLuminosity\n");
-            
+
             // 输出第0步
             int whiteCount = logger.getWhiteCount();
             int blackCount = logger.getBlackCount();
             int totalCount = whiteCount + blackCount;
             double avgTemp = logger.getAverageTemperature();
-            
-            csvWriter.append(String.format("%d,%.2f,%d,%d,%d,%.4f\n", 
-                            0, avgTemp, whiteCount, blackCount, totalCount, Params.SOLAR_LUMINOSITY));
-            
+
+            csvWriter.append(String.format("%d,%.2f,%d,%d,%d,%.4f\n",
+                    0, avgTemp, whiteCount, blackCount, totalCount, Params.SOLAR_LUMINOSITY));
+
             for (int t = 1; t < Params.MAX_SIMULATION_STEPS; t++) {
                 // 先更新温度和雏菊状态
                 world.updateTemperatures();
                 world.diffuseTemperature();
                 world.checkAllDaisySurvivals();
-                
+
                 // 然后记录数据
                 whiteCount = logger.getWhiteCount();
                 blackCount = logger.getBlackCount();
                 totalCount = whiteCount + blackCount;
                 avgTemp = logger.getAverageTemperature();
-                
+
                 // 只记录前10步的详细日志
                 if (t <= 10) {
                     System.out.println("第" + t + "步:");
@@ -65,13 +66,13 @@ public class Simulation {
                     System.out.println("  白雏菊数量: " + whiteCount);
                     System.out.println("  黑雏菊数量: " + blackCount);
                 }
-                
+
                 // 输出到控制台
                 logger.printStats(t);
-                
+
                 // 写入CSV
-                csvWriter.append(String.format("%d,%.2f,%d,%d,%d,%.4f\n", 
-                                t, avgTemp, whiteCount, blackCount, totalCount, Params.SOLAR_LUMINOSITY));
+                csvWriter.append(String.format("%d,%.2f,%d,%d,%d,%.4f\n",
+                        t, avgTemp, whiteCount, blackCount, totalCount, Params.SOLAR_LUMINOSITY));
 
                 // === SCENARIO 控制 ===
                 if (Params.SCENARIO== Params.LUMINOSITY_SCENARIO.RAMP_UP_RAMP_DOWN) {
@@ -88,9 +89,9 @@ public class Simulation {
                     Params.SOLAR_LUMINOSITY = 1.4;
                 }
             }
-            
+
             System.out.println("模拟结束，结果已保存到 " + csvFilename);
-            
+
         } catch (IOException e) {
             System.err.println("Error writing to CSV file: " + e.getMessage());
         }
