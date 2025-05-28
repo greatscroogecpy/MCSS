@@ -15,45 +15,47 @@ public class World {
                 grid[i][j] = new Patch();
     }
 
-    // 随机初始化 Daisy 分布
+    // 随机初始化 Daisy 分布 - 采用NetLogo的方式
     public void worldInit(){
-        // 确保所有单元格温度为0
-        for (int i = 0; i < size; i++)
-            for (int j = 0; j < size; j++)
-                grid[i][j].setTemperature(0.0);
-
-        int totalPatchs = size*size;
-        int whiteCount=(int) (totalPatchs* Params.START_WHITE_RATIO);
-        int blackCount=(int) (totalPatchs* Params.START_BLACK_RATIO);
-        int surfaceCount= totalPatchs-whiteCount-blackCount;
-
-        List<String> daisies = new ArrayList<>();
-
-        for (int i = 0; i < whiteCount; i++) daisies.add("W");
-        for (int i = 0; i < blackCount; i++) daisies.add("B");
-        for (int i = 0; i < surfaceCount; i++) daisies.add("E");
-
-        Collections.shuffle(daisies);
-
-        int idx = 0;
+        // 首先初始化所有地块为空地
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                String state = daisies.get(idx++);
-                switch (state) {
-                    case "W":
-                        grid[j][i] = new Patch(new Daisy(Daisy.Color.WHITE,rand.nextInt(Params.DAISY_MAX_AGE)));
-                        grid[j][i].setTemperature(0.0); // 确保新创建的单元格温度为0
-                        break;
-                    case "B":
-                        grid[j][i] = new Patch(new Daisy(Daisy.Color.BLACK,rand.nextInt(Params.DAISY_MAX_AGE)));
-                        grid[j][i].setTemperature(0.0); // 确保新创建的单元格温度为0
-                        break;
-                    case "E":
-                        grid[j][i] = new Patch(); // 空地
-                        grid[j][i].setTemperature(0.0); // 确保新创建的单元格温度为0
-                        break;
-                }
+                grid[i][j] = new Patch(); // 创建空地块
+                grid[i][j].setTemperature(0.0);
             }
+        }
+
+        int totalPatches = size * size;
+        int whiteCount = (int) (totalPatches * Params.START_WHITE_RATIO);
+        int blackCount = (int) (totalPatches * Params.START_BLACK_RATIO);
+
+        // 创建所有地块位置的列表
+        List<int[]> availablePositions = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                availablePositions.add(new int[]{i, j});
+            }
+        }
+
+        // 随机打乱位置列表
+        Collections.shuffle(availablePositions);
+
+        // 放置黑雏菊 - 类似NetLogo的 ask n-of ... patches with [not any? daisies-here]
+        for (int i = 0; i < blackCount && i < availablePositions.size(); i++) {
+            int[] pos = availablePositions.get(i);
+            int x = pos[0];
+            int y = pos[1];
+            // 设置随机年龄，如NetLogo中的 ask daisies [set age random max-age]
+            grid[x][y].setDaisy(new Daisy(Daisy.Color.BLACK, rand.nextInt(Params.DAISY_MAX_AGE)));
+        }
+
+        // 放置白雏菊 - 在剩余的空位置中选择
+        for (int i = blackCount; i < blackCount + whiteCount && i < availablePositions.size(); i++) {
+            int[] pos = availablePositions.get(i);
+            int x = pos[0];
+            int y = pos[1];
+            // 设置随机年龄，如NetLogo中的 ask daisies [set age random max-age]
+            grid[x][y].setDaisy(new Daisy(Daisy.Color.WHITE, rand.nextInt(Params.DAISY_MAX_AGE)));
         }
 
         // 打印诊断信息

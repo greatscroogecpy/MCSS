@@ -77,8 +77,10 @@ public class Patch {
             if (this.daisy.isDead()) {
                 this.daisy = null;
             }
-            // Only allow reproduction for Daisy older than 1 tick
-            else if (this.daisy.getAge() >= 1) {
+                        // Only allow reproduction for Daisy older than 1 tick
+                        //else if (this.daisy.getAge() >= 1) {
+            // NetLogo版本没有年龄限制条件，直接计算繁殖概率
+            else {
                 double seedThreshold = 0.1457 * this.temperature - 0.0032 * Math.pow(this.temperature, 2) - 0.6443;
 
                 List<Patch> freeNeighbours = new ArrayList<>();
