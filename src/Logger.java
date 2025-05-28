@@ -31,6 +31,19 @@ public class Logger {
         return count;
     }
 
+    public int getGrayCount() {
+        int count = 0;
+        for (int i = 0; i < world.getSize(); i++) {
+            for (int j = 0; j < world.getSize(); j++) {
+                Daisy daisy = world.getGrid()[i][j].getDaisy();
+                if (daisy != null && daisy.getColor() == Daisy.Color.GRAY) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
     public double getAverageTemperature() {
         double sum = 0.0;
         int size = world.getSize();
@@ -44,10 +57,11 @@ public class Logger {
     public void printStats(int tick) {
         int white = getWhiteCount();
         int black = getBlackCount();
-        int total = white + black;
+        int gray = getGrayCount();
+        int total = white + black + gray;
         double temp = getAverageTemperature();
-        System.out.printf("Tick %d | Temp: %.2f°C | White: %d | Black: %d | Total: %d\n",
-                tick, temp, white, black, total);
+        System.out.printf("Tick %d | Temp: %.2f°C | White: %d | Black: %d | Gray: %d | Total: %d\n",
+                tick, temp, white, black, gray, total);
     }
 
     public void printGrid() {
@@ -60,8 +74,10 @@ public class Logger {
                     System.out.print(". ");
                 } else if (d.getColor() == Daisy.Color.WHITE) {
                     System.out.print("W ");
-                } else {
+                } else if (d.getColor() == Daisy.Color.BLACK) {
                     System.out.print("B ");
+                } else {
+                    System.out.print("G ");
                 }
             }
             System.out.println();

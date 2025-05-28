@@ -9,12 +9,14 @@ public class Params {
     // Initial distribution ratios
     public static double START_WHITE_RATIO=0.2;
     public static double START_BLACK_RATIO=0.2;
+    public static double START_GRAY_RATIO=0.1;
 
     // Daisy parameters
     public static final int DAISY_MAX_AGE = 25;
     // Using actual parameter values shown in NetLogo interface
     public static final double WHITE_DAISY_ALBEDO = 0.75; // NetLogo default value
     public static final double BLACK_DAISY_ALBEDO = 0.25; // NetLogo default value
+    public static final double GRAY_DAISY_ALBEDO = 0.5;  // Medium albedo for gray daisies
 
     // Cell parameters
     public static double DEFAULT_CELL_TEMPERATURE = 0.0;

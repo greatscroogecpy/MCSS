@@ -7,7 +7,7 @@ public class Daisy {
     public int getAge() { return age;}
 
     public enum Color {
-        WHITE, BLACK
+        WHITE, BLACK, GRAY
     }
 
     private Color color;

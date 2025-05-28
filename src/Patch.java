@@ -39,7 +39,16 @@ public class Patch {
 
     public double getAlbedo() {
         if (daisy == null) return Params.SURFACE_ALBEDO;
-        return daisy.getColor() == Daisy.Color.WHITE ? Params.WHITE_DAISY_ALBEDO : Params.BLACK_DAISY_ALBEDO;
+        switch (daisy.getColor()) {
+            case WHITE:
+                return Params.WHITE_DAISY_ALBEDO;
+            case BLACK:
+                return Params.BLACK_DAISY_ALBEDO;
+            case GRAY:
+                return Params.GRAY_DAISY_ALBEDO;
+            default:
+                return Params.SURFACE_ALBEDO;
+        }
     }
 
     public void removeDaisy(){
