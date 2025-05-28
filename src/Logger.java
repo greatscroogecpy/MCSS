@@ -7,23 +7,27 @@ public class Logger {
 
     public int getWhiteCount() {
         int count = 0;
-        for (int i = 0; i < world.getSize(); i++)
+        for (int i = 0; i < world.getSize(); i++) {
             for (int j = 0; j < world.getSize(); j++) {
-                Daisy d = world.getGrid()[i][j].getDaisy();
-                if (d != null && d.getColor() == Daisy.Color.WHITE)
+                Daisy daisy = world.getGrid()[i][j].getDaisy();
+                if (daisy != null && daisy.getColor() == Daisy.Color.WHITE) {
                     count++;
+                }
             }
+        }
         return count;
     }
 
     public int getBlackCount() {
         int count = 0;
-        for (int i = 0; i < world.getSize(); i++)
+        for (int i = 0; i < world.getSize(); i++) {
             for (int j = 0; j < world.getSize(); j++) {
-                Daisy d = world.getGrid()[i][j].getDaisy();
-                if (d != null && d.getColor() == Daisy.Color.BLACK)
+                Daisy daisy = world.getGrid()[i][j].getDaisy();
+                if (daisy != null && daisy.getColor() == Daisy.Color.BLACK) {
                     count++;
+                }
             }
+        }
         return count;
     }
 

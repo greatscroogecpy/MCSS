@@ -6,15 +6,20 @@ public class Patch {
     private double temperature;
     private Daisy daisy;
     private static final Random rand = new Random();
+    
+    // Soil quality (0.5-1.5, 1.0 is standard)
+    private double soilQuality;
 
     public Patch() {
         this.temperature = Params.DEFAULT_CELL_TEMPERATURE;
         this.daisy = null;
+        this.soilQuality = 1.0;
     }
 
     public Patch(Daisy daisy){
         this.temperature = Params.DEFAULT_CELL_TEMPERATURE;
         this.daisy = daisy;
+        this.soilQuality = 1.0;
     }
 
     public double getTemperature() {
@@ -47,25 +52,13 @@ public class Patch {
 
         absorbedLuminosity = (1 - this.getAlbedo()) * Params.SOLAR_LUMINOSITY;
 
-        boolean isFirst = (this.temperature == 0.0);
-
         if (absorbedLuminosity > 0) {
             localHeating = 72 * Math.log(absorbedLuminosity) + 80;
         } else {
             localHeating = 80;
         }
 
-        double oldTemp = this.temperature;
         this.temperature = (this.temperature + localHeating) / 2;
-
-        if (isFirst && Math.random() < 0.01) {
-            System.out.println("温度计算示例:");
-            System.out.println("  反照率: " + this.getAlbedo());
-            System.out.println("  吸收光度: " + absorbedLuminosity);
-            System.out.println("  局部加热: " + localHeating);
-            System.out.println("  初始温度: " + oldTemp);
-            System.out.println("  更新后温度: " + this.temperature);
-        }
     }
 
     public void checkSurvivability(List<Patch> neighbours){
@@ -77,11 +70,13 @@ public class Patch {
             if (this.daisy.isDead()) {
                 this.daisy = null;
             }
-                        // Only allow reproduction for Daisy older than 1 tick
-                        //else if (this.daisy.getAge() >= 1) {
-            // NetLogo版本没有年龄限制条件，直接计算繁殖概率
             else {
                 double seedThreshold = 0.1457 * this.temperature - 0.0032 * Math.pow(this.temperature, 2) - 0.6443;
+                
+                // Soil quality affects reproduction probability
+                if (Params.ENABLE_SPATIAL_HETEROGENEITY) {
+                    seedThreshold *= this.soilQuality;
+                }
 
                 List<Patch> freeNeighbours = new ArrayList<>();
                 for(Patch neighbour : neighbours){
@@ -92,12 +87,11 @@ public class Patch {
 
                 if(!freeNeighbours.isEmpty() && Math.random() < seedThreshold){
                     Patch chosen = freeNeighbours.get(rand.nextInt(freeNeighbours.size()));
-                    chosen.daisy = new Daisy(this.daisy.getColor()); // default age = 0
+                    chosen.setDaisy(new Daisy(this.daisy.getColor(), 0));
                 }
             }
         }
     }
-
 
     public void diffuse(List<Patch> neighbors){
         double oldTemp = this.temperature;
@@ -108,5 +102,15 @@ public class Patch {
         }
     }
 
-
+    // Set soil quality with random variation
+    public void setSoilQuality() {
+        if (Params.ENABLE_SPATIAL_HETEROGENEITY) {
+            // Generate soil quality between 0.5 and 1.5
+            this.soilQuality = 1.0 + (rand.nextGaussian() * Params.SOIL_QUALITY_VARIANCE);
+            // Clamp to reasonable range
+            this.soilQuality = Math.max(0.5, Math.min(1.5, this.soilQuality));
+        } else {
+            this.soilQuality = 1.0; // Standard soil quality
+        }
+    }
 }

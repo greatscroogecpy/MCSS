@@ -1,5 +1,3 @@
-import java.util.Random;
-
 // All files are in the default package
 public class Daisy {
     public void setAge(int age) {

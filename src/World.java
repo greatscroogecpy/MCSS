@@ -1,5 +1,5 @@
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 public class World {
     private final int size;
@@ -15,13 +15,14 @@ public class World {
                 grid[i][j] = new Patch();
     }
 
-    // 随机初始化 Daisy 分布 - 采用NetLogo的方式
+    // Random initialization of Daisy distribution - using NetLogo approach
     public void worldInit(){
-        // 首先初始化所有地块为空地
+        // First initialize all patches as empty land and set soil quality
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                grid[i][j] = new Patch(); // 创建空地块
+                grid[i][j] = new Patch(); // Create empty patch
                 grid[i][j].setTemperature(0.0);
+                grid[i][j].setSoilQuality(); // Set soil quality
             }
         }
 
@@ -29,7 +30,7 @@ public class World {
         int whiteCount = (int) (totalPatches * Params.START_WHITE_RATIO);
         int blackCount = (int) (totalPatches * Params.START_BLACK_RATIO);
 
-        // 创建所有地块位置的列表
+        // Create list of all patch positions
         List<int[]> availablePositions = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -37,39 +38,39 @@ public class World {
             }
         }
 
-        // 随机打乱位置列表
+        // Randomly shuffle position list
         Collections.shuffle(availablePositions);
 
-        // 放置黑雏菊 - 类似NetLogo的 ask n-of ... patches with [not any? daisies-here]
-        for (int i = 0; i < blackCount && i < availablePositions.size(); i++) {
-            int[] pos = availablePositions.get(i);
+        int positionIndex = 0;
+
+        // Place black daisies
+        for (int i = 0; i < blackCount && positionIndex < availablePositions.size(); i++, positionIndex++) {
+            int[] pos = availablePositions.get(positionIndex);
             int x = pos[0];
             int y = pos[1];
-            // 设置随机年龄，如NetLogo中的 ask daisies [set age random max-age]
             grid[x][y].setDaisy(new Daisy(Daisy.Color.BLACK, rand.nextInt(Params.DAISY_MAX_AGE)));
         }
 
-        // 放置白雏菊 - 在剩余的空位置中选择
-        for (int i = blackCount; i < blackCount + whiteCount && i < availablePositions.size(); i++) {
-            int[] pos = availablePositions.get(i);
+        // Place white daisies
+        for (int i = 0; i < whiteCount && positionIndex < availablePositions.size(); i++, positionIndex++) {
+            int[] pos = availablePositions.get(positionIndex);
             int x = pos[0];
             int y = pos[1];
-            // 设置随机年龄，如NetLogo中的 ask daisies [set age random max-age]
             grid[x][y].setDaisy(new Daisy(Daisy.Color.WHITE, rand.nextInt(Params.DAISY_MAX_AGE)));
         }
 
-        // 打印诊断信息
-        System.out.println("初始化完成前:");
-        System.out.println("白雏菊反照率: " + Params.WHITE_DAISY_ALBEDO);
-        System.out.println("黑雏菊反照率: " + Params.BLACK_DAISY_ALBEDO);
-        System.out.println("地表反照率: " + Params.SURFACE_ALBEDO);
-        System.out.println("太阳光度: " + Params.SOLAR_LUMINOSITY);
-        System.out.println("随机取样的初始温度: " + grid[0][0].getTemperature());
+        // Print diagnostic information
+        System.out.println("Before initialization completion:");
+        System.out.println("White daisy albedo: " + Params.WHITE_DAISY_ALBEDO);
+        System.out.println("Black daisy albedo: " + Params.BLACK_DAISY_ALBEDO);
+        System.out.println("Surface albedo: " + Params.SURFACE_ALBEDO);
+        System.out.println("Solar luminosity: " + Params.SOLAR_LUMINOSITY);
+        System.out.println("Random sample initial temperature: " + grid[0][0].getTemperature());
 
-        // 初始化完毕后更新每个 Patch 的温度
+        // Update temperature for each Patch after initialization
         updateTemperatures();
 
-        // 打印更新后的温度
+        // Print updated temperature
         double totalTemp = 0;
         int count = 0;
         for (int i = 0; i < size; i++) {
@@ -78,15 +79,15 @@ public class World {
                 count++;
             }
         }
-        System.out.println("初始化后平均温度: " + (totalTemp / count));
-        System.out.println("随机取样的更新后温度: " + grid[0][0].getTemperature());
+        System.out.println("Average temperature after initialization: " + (totalTemp / count));
+        System.out.println("Random sample updated temperature: " + grid[0][0].getTemperature());
     }
 
-    // 重新计算每个 Patch 的温度
+    // Recalculate temperature for each Patch
     public void updateTemperatures() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                grid[i][j].updateTemperature();  // 每个 patch 自己更新温度
+                grid[i][j].updateTemperature();  // Each patch updates its own temperature
             }
         }
     }
@@ -99,14 +100,14 @@ public class World {
                 double oldTemp = grid[i][j].getTemperature();
                 double retained = oldTemp * (1 - diffusionRatio);
 
-                // 自己保留部分
+                // Retain portion for self
                 newTemps[i][j] += retained;
 
-                // 获取邻居并计算分享温度
+                // Get neighbors and calculate shared temperature
                 List<Patch> neighbors = getNeighbors(i, j);
                 double shared = oldTemp * diffusionRatio / neighbors.size();
 
-                // 将共享部分扩散到邻居
+                // Diffuse shared portion to neighbors
                 for (int dx = -1; dx <= 1; dx++) {
                     for (int dy = -1; dy <= 1; dy++) {
                         if (dx == 0 && dy == 0) continue;
@@ -119,9 +120,7 @@ public class World {
             }
         }
 
-
-
-        // 统一更新所有单元格的温度
+        // Update all cell temperatures uniformly
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 grid[i][j].setTemperature(newTemps[i][j]);
