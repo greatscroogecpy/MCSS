@@ -1,5 +1,15 @@
+import org.knowm.xchart.*;
+import org.knowm.xchart.style.markers.None;
+import java.util.*;
+
 public class Logger {
     private final World world;
+
+    // Data lists for charting
+    private final List<Integer> ticks = new ArrayList<>();
+    private final List<Double> temperatures = new ArrayList<>();
+    private final List<Integer> whiteCounts = new ArrayList<>();
+    private final List<Integer> blackCounts = new ArrayList<>();
 
     public Logger(World world) {
         this.world = world;
@@ -37,6 +47,13 @@ public class Logger {
         return sum / (size * size);
     }
 
+    public void record(int tick) {
+        ticks.add(tick);
+        temperatures.add(getAverageTemperature());
+        whiteCounts.add(getWhiteCount());
+        blackCounts.add(getBlackCount());
+    }
+
     public void printStats(int tick) {
         int white = getWhiteCount();
         int black = getBlackCount();
@@ -46,21 +63,21 @@ public class Logger {
                 tick, temp, white, black, total);
     }
 
-    public void printGrid() {
-        Patch[][] grid = world.getGrid();
-        int size = world.getSize();
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                Daisy d = grid[i][j].getDaisy();
-                if (d == null) {
-                    System.out.print(". ");
-                } else if (d.getColor() == Daisy.Color.WHITE) {
-                    System.out.print("W ");
-                } else {
-                    System.out.print("B ");
-                }
-            }
-            System.out.println();
-        }
+    public void displayCharts() {
+        // Temperature Chart
+        XYChart tempChart = new XYChartBuilder().width(800).height(400)
+                .title("Average Temperature Over Time")
+                .xAxisTitle("Tick").yAxisTitle("Temperature (°C)").build();
+        tempChart.addSeries("Temperature", ticks, temperatures).setMarker(new None());
+
+        // Daisy Count Chart
+        XYChart daisyChart = new XYChartBuilder().width(800).height(400)
+                .title("Daisy Count Over Time")
+                .xAxisTitle("Tick").yAxisTitle("Count").build();
+        daisyChart.addSeries("White Daisies", ticks, whiteCounts).setMarker(new None());
+        daisyChart.addSeries("Black Daisies", ticks, blackCounts).setMarker(new None());
+
+        // Show charts
+        new SwingWrapper<>(Arrays.asList(tempChart, daisyChart)).displayChartMatrix();
     }
 }

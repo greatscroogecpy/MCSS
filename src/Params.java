@@ -28,7 +28,7 @@ public class Params {
     public static double DEFAULT_CELL_TEMPERATURE = 0.0;
     public static double SURFACE_ALBEDO = 0.4; // NetLogo默认的albedo-of-surface值
 
-    public static LUMINOSITY_SCENARIO SCENARIO =LUMINOSITY_SCENARIO.MAINTAIN_CURRENT_LUMINOSITY;
+    public static LUMINOSITY_SCENARIO SCENARIO =LUMINOSITY_SCENARIO.RAMP_UP_RAMP_DOWN;
 
 
     // Simulation parameters

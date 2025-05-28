@@ -1,6 +1,8 @@
+import java.util.ArrayList;
 import java.util.Collections;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 // Since all files are in the same package (src), no import is needed
 public class Simulation {
@@ -68,6 +70,7 @@ public class Simulation {
 
                 // 输出到控制台
                 logger.printStats(t);
+                logger.record(t);
 
                 // 写入CSV
                 csvWriter.append(String.format("%d,%.2f,%d,%d,%d,%.4f\n",
@@ -94,6 +97,8 @@ public class Simulation {
         } catch (IOException e) {
             System.err.println("Error writing to CSV file: " + e.getMessage());
         }
+
+        logger.displayCharts();
     }
 
     private static double roundTo4(double val) {

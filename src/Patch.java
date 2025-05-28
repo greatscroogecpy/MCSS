@@ -37,10 +37,6 @@ public class Patch {
         return daisy.getColor() == Daisy.Color.WHITE ? Params.WHITE_DAISY_ALBEDO : Params.BLACK_DAISY_ALBEDO;
     }
 
-    public void removeDaisy(){
-        daisy = null;
-    }
-
     public void updateTemperature(){
         double absorbedLuminosity;
         double localHeating;
@@ -52,7 +48,7 @@ public class Patch {
         if (absorbedLuminosity > 0) {
             localHeating = 72 * Math.log(absorbedLuminosity) + 80;
         } else {
-            localHeating = 80;
+            localHeating =0;
         }
 
         double oldTemp = this.temperature;
