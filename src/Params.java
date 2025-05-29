@@ -16,7 +16,7 @@ public class Params {
     public static double SOLAR_LUMINOSITY = 0.8;
 
     public static double START_WHITE_RATIO=0.2;
-    public static double START_BLACK_RATIO=0.2;
+    public static double START_BLACK_RATIO=0;
 
     // Daisy parameters
     public static final int DAISY_MAX_AGE = 25;
@@ -28,7 +28,7 @@ public class Params {
     public static double DEFAULT_CELL_TEMPERATURE = 0.0;
     public static double SURFACE_ALBEDO = 0.4; // NetLogo默认的albedo-of-surface值
 
-    public static LUMINOSITY_SCENARIO SCENARIO =LUMINOSITY_SCENARIO.RAMP_UP_RAMP_DOWN;
+    public static LUMINOSITY_SCENARIO SCENARIO =LUMINOSITY_SCENARIO.HIGH_SOLAR_LUMINOSITY;
 
 
     // Simulation parameters

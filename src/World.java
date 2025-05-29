@@ -58,14 +58,6 @@ public class World {
             grid[x][y].setDaisy(new Daisy(Daisy.Color.WHITE, rand.nextInt(Params.DAISY_MAX_AGE)));
         }
 
-        // 打印诊断信息
-        System.out.println("初始化完成前:");
-        System.out.println("白雏菊反照率: " + Params.WHITE_DAISY_ALBEDO);
-        System.out.println("黑雏菊反照率: " + Params.BLACK_DAISY_ALBEDO);
-        System.out.println("地表反照率: " + Params.SURFACE_ALBEDO);
-        System.out.println("太阳光度: " + Params.SOLAR_LUMINOSITY);
-        System.out.println("随机取样的初始温度: " + grid[0][0].getTemperature());
-
         // 初始化完毕后更新每个 Patch 的温度
         updateTemperatures();
 
@@ -78,8 +70,6 @@ public class World {
                 count++;
             }
         }
-        System.out.println("初始化后平均温度: " + (totalTemp / count));
-        System.out.println("随机取样的更新后温度: " + grid[0][0].getTemperature());
     }
 
     // 重新计算每个 Patch 的温度

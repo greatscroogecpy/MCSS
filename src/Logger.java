@@ -1,15 +1,17 @@
 import org.knowm.xchart.*;
 import org.knowm.xchart.style.markers.None;
+import org.knowm.xchart.BitmapEncoder;
+import org.knowm.xchart.BitmapEncoder.BitmapFormat;
+
+import java.io.IOException;
 import java.util.*;
 
 public class Logger {
-    private final World world;
-
-    // Data lists for charting
     private final List<Integer> ticks = new ArrayList<>();
     private final List<Double> temperatures = new ArrayList<>();
     private final List<Integer> whiteCounts = new ArrayList<>();
     private final List<Integer> blackCounts = new ArrayList<>();
+    private final World world;
 
     public Logger(World world) {
         this.world = world;
@@ -63,21 +65,48 @@ public class Logger {
                 tick, temp, white, black, total);
     }
 
-    public void displayCharts() {
-        // Temperature Chart
+    public List<Integer> getTicks() {
+        return ticks;
+    }
+
+    public List<Double> getTemperatures() {
+        return temperatures;
+    }
+
+    public List<Integer> getWhiteCounts() {
+        return whiteCounts;
+    }
+
+    public List<Integer> getBlackCounts() {
+        return blackCounts;
+    }
+
+    public static void displayCharts(List<Integer> ticks,
+                                     List<Double> avgTemperatures,
+                                     List<Integer> avgWhiteCounts,
+                                     List<Integer> avgBlackCounts, String folderName) {
+
         XYChart tempChart = new XYChartBuilder().width(800).height(400)
                 .title("Average Temperature Over Time")
                 .xAxisTitle("Tick").yAxisTitle("Temperature (°C)").build();
-        tempChart.addSeries("Temperature", ticks, temperatures).setMarker(new None());
+        tempChart.addSeries("Temperature", ticks, avgTemperatures).setMarker(new None());
 
-        // Daisy Count Chart
         XYChart daisyChart = new XYChartBuilder().width(800).height(400)
                 .title("Daisy Count Over Time")
                 .xAxisTitle("Tick").yAxisTitle("Count").build();
-        daisyChart.addSeries("White Daisies", ticks, whiteCounts).setMarker(new None());
-        daisyChart.addSeries("Black Daisies", ticks, blackCounts).setMarker(new None());
+        daisyChart.addSeries("White Daisies", ticks, avgWhiteCounts).setMarker(new None());
+        daisyChart.addSeries("Black Daisies", ticks, avgBlackCounts).setMarker(new None());
 
-        // Show charts
+        // show charts
         new SwingWrapper<>(Arrays.asList(tempChart, daisyChart)).displayChartMatrix();
+
+        // Save as png
+        try {
+            BitmapEncoder.saveBitmap(tempChart, folderName + "/TemperatureChart", BitmapFormat.PNG);
+            BitmapEncoder.saveBitmap(daisyChart, folderName + "/DaisyChart", BitmapFormat.PNG);
+            System.out.println("Successfully saved as TemperatureChart.png 和 DaisyChart.png");
+        } catch (IOException e) {
+            System.err.println("Failure Saving: " + e.getMessage());
+        }
     }
 }

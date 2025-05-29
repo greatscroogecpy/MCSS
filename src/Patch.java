@@ -43,7 +43,6 @@ public class Patch {
 
         absorbedLuminosity = (1 - this.getAlbedo()) * Params.SOLAR_LUMINOSITY;
 
-        boolean isFirst = (this.temperature == 0.0);
 
         if (absorbedLuminosity > 0) {
             localHeating = 72 * Math.log(absorbedLuminosity) + 80;
@@ -54,14 +53,6 @@ public class Patch {
         double oldTemp = this.temperature;
         this.temperature = (this.temperature + localHeating) / 2;
 
-        if (isFirst && Math.random() < 0.01) {
-            System.out.println("温度计算示例:");
-            System.out.println("  反照率: " + this.getAlbedo());
-            System.out.println("  吸收光度: " + absorbedLuminosity);
-            System.out.println("  局部加热: " + localHeating);
-            System.out.println("  初始温度: " + oldTemp);
-            System.out.println("  更新后温度: " + this.temperature);
-        }
     }
 
     public void checkSurvivability(List<Patch> neighbours){
@@ -73,9 +64,6 @@ public class Patch {
             if (this.daisy.isDead()) {
                 this.daisy = null;
             }
-                        // Only allow reproduction for Daisy older than 1 tick
-                        //else if (this.daisy.getAge() >= 1) {
-            // NetLogo版本没有年龄限制条件，直接计算繁殖概率
             else {
                 double seedThreshold = 0.1457 * this.temperature - 0.0032 * Math.pow(this.temperature, 2) - 0.6443;
 
@@ -91,16 +79,6 @@ public class Patch {
                     chosen.daisy = new Daisy(this.daisy.getColor()); // default age = 0
                 }
             }
-        }
-    }
-
-
-    public void diffuse(List<Patch> neighbors){
-        double oldTemp = this.temperature;
-        this.temperature *= (1 - Params.DIFFUSION_RATIO);
-        double share = (oldTemp * Params.DIFFUSION_RATIO) / neighbors.size();
-        for (Patch neighbor : neighbors) {
-            neighbor.temperature += share;
         }
     }
 
