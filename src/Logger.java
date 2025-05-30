@@ -1,13 +1,17 @@
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-import java.io.FileWriter;
+//import org.knowm.xchart.*;
+//import org.knowm.xchart.style.markers.None;
+//import org.knowm.xchart.BitmapEncoder;
+//import org.knowm.xchart.BitmapEncoder.BitmapFormat;
 
     public class Logger {
-//        private final List<Integer> ticks = new ArrayList<>();
-//        private final List<Double> temperatures = new ArrayList<>();
-//        private final List<Integer> whiteCounts = new ArrayList<>();
-//        private final List<Integer> blackCounts = new ArrayList<>();
+
+        private final List<Integer> ticks = new ArrayList<>();
+        private final List<Double> temperatures = new ArrayList<>();
+        private final List<Integer> whiteCounts = new ArrayList<>();
+        private final List<Integer> blackCounts = new ArrayList<>();
         private final World world;
         private FileWriter csvWriter;
 
@@ -65,12 +69,12 @@ import java.io.FileWriter;
             return sum / (size * size);
         }
 
-//        public void record(int tick) {
-//            ticks.add(tick);
-//            temperatures.add(getAverageTemperature());
-//            whiteCounts.add(getWhiteCount());
-//            blackCounts.add(getBlackCount());
-//        }
+        public void record(int tick) {
+            ticks.add(tick);
+            temperatures.add(getAverageTemperature());
+            whiteCounts.add(getWhiteCount());
+            blackCounts.add(getBlackCount());
+        }
 
         public void printStats(int tick) {
             double avgTemp = getAverageTemperature();
@@ -92,21 +96,22 @@ import java.io.FileWriter;
             }
         }
 
-//        public List<Integer> getTicks() {
-//            return ticks;
-//        }
-//
-//        public List<Double> getTemperatures() {
-//            return temperatures;
-//        }
-//
-//        public List<Integer> getWhiteCounts() {
-//            return whiteCounts;
-//        }
-//
-//        public List<Integer> getBlackCounts() {
-//            return blackCounts;
-//        }
+        public List<Integer> getTicks() {
+            return ticks;
+        }
+
+        public List<Double> getTemperatures() {
+            return temperatures;
+        }
+
+        public List<Integer> getWhiteCounts() {
+            return whiteCounts;
+        }
+
+        public List<Integer> getBlackCounts() {
+            return blackCounts;
+        }
+
 
 //        public static void displayCharts(List<Integer> ticks,
 //                                         List<Double> avgTemperatures,
@@ -136,6 +141,7 @@ import java.io.FileWriter;
 //                System.err.println("Failure Saving: " + e.getMessage());
 //
 //            }
+//        }
 
 
 }

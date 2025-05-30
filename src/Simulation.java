@@ -1,67 +1,88 @@
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.*;
 
 // Since all files are in the same package (src), no import is needed
 public class Simulation {
     public static void main(String[] args) {
 
-        System.out.println("=== Daisyworld Simulation ===");
-        System.out.println("Parameter Settings:");
-        System.out.println("  White Daisy Albedo: " + Params.WHITE_DAISY_ALBEDO);
-        System.out.println("  Black Daisy Albedo: " + Params.BLACK_DAISY_ALBEDO);
-        System.out.println("  Surface Albedo: " + Params.SURFACE_ALBEDO);
-        System.out.println("  Solar Luminosity: " + Params.SOLAR_LUMINOSITY);
-        System.out.println("  Initial White Ratio: " + Params.START_WHITE_RATIO);
-        System.out.println("  Initial Black Ratio: " + Params.START_BLACK_RATIO);
-        System.out.println("  Soil Quality Heterogeneity: " + (Params.ENABLE_SPATIAL_HETEROGENEITY ? "Enabled" : "Disabled"));
-        if (Params.ENABLE_SPATIAL_HETEROGENEITY) {
-            System.out.println("  Soil Quality Variance: " + Params.SOIL_QUALITY_VARIANCE);
-        }
+        final int RUNS = 30;
+        List<Double> sumTemperatures = new ArrayList<>(Collections.nCopies(Params.MAX_SIMULATION_STEPS, 0.0));
+        List<Integer> sumWhiteCounts = new ArrayList<>(Collections.nCopies(Params.MAX_SIMULATION_STEPS, 0));
+        List<Integer> sumBlackCounts = new ArrayList<>(Collections.nCopies(Params.MAX_SIMULATION_STEPS, 0));
 
-        World world = new World();
-        world.worldInit();
 
-        Logger logger = new Logger(world);
-//        logger.printStats(0);
 
-        // Record initial state (step 0)
-        System.out.println("Initial State (Step 0):");
-        System.out.println("  Average Temperature: " + logger.getAverageTemperature());
-        System.out.println("  White Daisies: " + logger.getWhiteCount());
-        System.out.println("  Black Daisies: " + logger.getBlackCount());
-        System.out.println("  Total Daisies: " + (logger.getWhiteCount() + logger.getBlackCount()));
+        for (int run = 0; run < RUNS; run++) {
+            World world = new World();
+            world.worldInit();
+            Logger logger = new Logger(world);
 
-        // Main simulation loop
-        for (int tick = 1; tick <= Params.MAX_SIMULATION_STEPS; tick++) {
-            world.updateTemperatures();
-            world.diffuseTemperature();
-            world.checkAllDaisySurvivals();
-
-            if (Params.SCENARIO == Params.LUMINOSITY_SCENARIO.RAMP_UP_RAMP_DOWN) {
-                if (tick > 200 && tick <= 400) {
-                    Params.SOLAR_LUMINOSITY = roundTo4(Params.SOLAR_LUMINOSITY + 0.005);
-                } else if (tick > 600 && tick <= 850) {
-                    Params.SOLAR_LUMINOSITY = roundTo4(Params.SOLAR_LUMINOSITY - 0.0025);
+            for (int t = 0; t < Params.MAX_SIMULATION_STEPS; t++) {
+                if (t > 0) {
+                    world.updateTemperatures();
+                    world.diffuseTemperature();
+                    world.checkAllDaisySurvivals();
                 }
-            } else if (Params.SCENARIO == Params.LUMINOSITY_SCENARIO.LOW_SOLAR_LUMINOSITY) {
-                Params.SOLAR_LUMINOSITY = 0.6;
-            } else if (Params.SCENARIO == Params.LUMINOSITY_SCENARIO.OUR_SOLOAR_LUMINOSITY) {
-                Params.SOLAR_LUMINOSITY = 1.0;
-            } else if (Params.SCENARIO == Params.LUMINOSITY_SCENARIO.HIGH_SOLAR_LUMINOSITY) {
-                Params.SOLAR_LUMINOSITY = 1.4;
-            }
-            
-            // Print statistics every 10 steps
-//            if (tick % 10 == 0) {
-//                logger.printStats(tick);
-//            }
-            logger.printStats(tick);
+                logger.record(t);
 
+                if (Params.SCENARIO == Params.LUMINOSITY_SCENARIO.RAMP_UP_RAMP_DOWN) {
+                    if (t > 200 && t <= 400) {
+                        Params.SOLAR_LUMINOSITY = roundTo4(Params.SOLAR_LUMINOSITY + 0.005);
+                    } else if (t > 600 && t <= 850) {
+                        Params.SOLAR_LUMINOSITY = roundTo4(Params.SOLAR_LUMINOSITY - 0.0025);
+                    }
+                } else if (Params.SCENARIO == Params.LUMINOSITY_SCENARIO.LOW_SOLAR_LUMINOSITY) {
+                    Params.SOLAR_LUMINOSITY = 0.6;
+                } else if (Params.SCENARIO == Params.LUMINOSITY_SCENARIO.OUR_SOLOAR_LUMINOSITY) {
+                    Params.SOLAR_LUMINOSITY = 1.0;
+                } else if (Params.SCENARIO == Params.LUMINOSITY_SCENARIO.HIGH_SOLAR_LUMINOSITY) {
+                    Params.SOLAR_LUMINOSITY = 1.4;
+                }
+            }
+
+            for (int t = 0; t < Params.MAX_SIMULATION_STEPS; t++) {
+                sumTemperatures.set(t, sumTemperatures.get(t) + logger.getTemperatures().get(t));
+                sumWhiteCounts.set(t, sumWhiteCounts.get(t) + logger.getWhiteCounts().get(t));
+                sumBlackCounts.set(t, sumBlackCounts.get(t) + logger.getBlackCounts().get(t));
+            }
         }
 
-        System.out.println("Simulation completed!");
-        System.out.println("Results can be analyzed from the console output above");
+        List<Double> avgTemperatures = new ArrayList<>();
+        List<Integer> avgWhiteCounts = new ArrayList<>();
+        List<Integer> avgBlackCounts = new ArrayList<>();
+        List<Integer> ticks = new ArrayList<>();
+
+        for (int t = 0; t < Params.MAX_SIMULATION_STEPS; t++) {
+            ticks.add(t);
+            avgTemperatures.add(sumTemperatures.get(t) / RUNS);
+            avgWhiteCounts.add(sumWhiteCounts.get(t) / RUNS);
+            avgBlackCounts.add(sumBlackCounts.get(t) / RUNS);
+        }
+
+        String folderName = String.format("Result/avg_%.2f_%.2f_%.2f_%.2f_%s_%s",
+                Params.SOLAR_LUMINOSITY,
+                Params.START_WHITE_RATIO,
+                Params.START_BLACK_RATIO,
+                Params.START_GRAY_RATIO,
+                Params.SCENARIO.name(),
+                Params.ENABLE_SPATIAL_HETEROGENEITY ? "enable_spatial_heterogeneity" : "no_spatial_heterogeneity");
+        new File(folderName).mkdirs();
+
+        String csvFilename = folderName + "/result.csv";
+
+        try (FileWriter csvWriter = new FileWriter(csvFilename)) {
+            csvWriter.append("Tick,AverageTemperature,WhiteDaisyCount,BlackDaisyCount\n");
+            for (int t = 0; t < Params.MAX_SIMULATION_STEPS; t++) {
+                csvWriter.append(String.format("%d,%.2f,%d,%d\n",
+                        ticks.get(t), avgTemperatures.get(t), avgWhiteCounts.get(t), avgBlackCounts.get(t)));
+            }
+        } catch (IOException e) {
+            System.err.println("Error writing CSV: " + e.getMessage());
+        }
+
+       // Logger.displayCharts(ticks, avgTemperatures, avgWhiteCounts, avgBlackCounts,folderName);
     }
 
     private static double roundTo4(double val) {

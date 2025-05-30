@@ -51,9 +51,6 @@ public class Patch {
         }
     }
 
-    public void removeDaisy(){
-        daisy = null;
-    }
 
     public void updateTemperature(){
         double absorbedLuminosity;
@@ -102,14 +99,6 @@ public class Patch {
         }
     }
 
-    public void diffuse(List<Patch> neighbors){
-        double oldTemp = this.temperature;
-        this.temperature *= (1 - Params.DIFFUSION_RATIO);
-        double share = (oldTemp * Params.DIFFUSION_RATIO) / neighbors.size();
-        for (Patch neighbor : neighbors) {
-            neighbor.temperature += share;
-        }
-    }
 
     // Set soil quality with random variation
     public void setSoilQuality() {

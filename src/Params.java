@@ -9,7 +9,7 @@ public class Params {
     // Initial distribution ratios
     public static double START_WHITE_RATIO=0.2;
     public static double START_BLACK_RATIO=0.2;
-    public static double START_GRAY_RATIO=0.1;
+    public static double START_GRAY_RATIO=0;
 
     // Daisy parameters
     public static final int DAISY_MAX_AGE = 25;
@@ -34,14 +34,14 @@ public class Params {
         MAINTAIN_CURRENT_LUMINOSITY
     }
 
-    public static LUMINOSITY_SCENARIO SCENARIO =LUMINOSITY_SCENARIO.MAINTAIN_CURRENT_LUMINOSITY;
+    public static LUMINOSITY_SCENARIO SCENARIO =LUMINOSITY_SCENARIO.LOW_SOLAR_LUMINOSITY;
 
     // Spatial Heterogeneity parameters
-    public static boolean ENABLE_SPATIAL_HETEROGENEITY = true;
+    public static boolean ENABLE_SPATIAL_HETEROGENEITY = false;
     public static double SOIL_QUALITY_VARIANCE = 0.5; // Soil quality variance, controls soil quality variation range
 
     // Simulation parameters
     // Add more simulation parameters as needed
     public static int MAX_SIMULATION_STEPS = 1000; // Quick test
     public static double DIFFUSION_RATIO = 0.5;
-} 
+}
