@@ -1,9 +1,11 @@
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
 
 // Since all files are in the same package (src), no import is needed
 public class Simulation {
     public static void main(String[] args) {
+
         System.out.println("=== Daisyworld Simulation ===");
         System.out.println("Parameter Settings:");
         System.out.println("  White Daisy Albedo: " + Params.WHITE_DAISY_ALBEDO);
@@ -21,6 +23,7 @@ public class Simulation {
         world.worldInit();
 
         Logger logger = new Logger(world);
+//        logger.printStats(0);
 
         // Record initial state (step 0)
         System.out.println("Initial State (Step 0):");
@@ -34,11 +37,27 @@ public class Simulation {
             world.updateTemperatures();
             world.diffuseTemperature();
             world.checkAllDaisySurvivals();
+
+            if (Params.SCENARIO == Params.LUMINOSITY_SCENARIO.RAMP_UP_RAMP_DOWN) {
+                if (tick > 200 && tick <= 400) {
+                    Params.SOLAR_LUMINOSITY = roundTo4(Params.SOLAR_LUMINOSITY + 0.005);
+                } else if (tick > 600 && tick <= 850) {
+                    Params.SOLAR_LUMINOSITY = roundTo4(Params.SOLAR_LUMINOSITY - 0.0025);
+                }
+            } else if (Params.SCENARIO == Params.LUMINOSITY_SCENARIO.LOW_SOLAR_LUMINOSITY) {
+                Params.SOLAR_LUMINOSITY = 0.6;
+            } else if (Params.SCENARIO == Params.LUMINOSITY_SCENARIO.OUR_SOLOAR_LUMINOSITY) {
+                Params.SOLAR_LUMINOSITY = 1.0;
+            } else if (Params.SCENARIO == Params.LUMINOSITY_SCENARIO.HIGH_SOLAR_LUMINOSITY) {
+                Params.SOLAR_LUMINOSITY = 1.4;
+            }
             
             // Print statistics every 10 steps
-            if (tick % 10 == 0) {
-                logger.printStats(tick);
-            }
+//            if (tick % 10 == 0) {
+//                logger.printStats(tick);
+//            }
+            logger.printStats(tick);
+
         }
 
         System.out.println("Simulation completed!");
