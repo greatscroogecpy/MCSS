@@ -21,7 +21,6 @@ public class World {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 grid[i][j] = new Patch(); // Create empty patch
-                grid[i][j].setTemperature(0.0);
                 grid[i][j].setSoilQuality(); // Set soil quality
             }
         }
@@ -29,6 +28,7 @@ public class World {
         int totalPatches = size * size;
         int whiteCount = (int) (totalPatches * Params.START_WHITE_RATIO);
         int blackCount = (int) (totalPatches * Params.START_BLACK_RATIO);
+        int grayCount = (int) (totalPatches * Params.START_GRAY_RATIO);
 
         // Create list of all patch positions
         List<int[]> availablePositions = new ArrayList<>();
@@ -59,16 +59,25 @@ public class World {
             grid[x][y].setDaisy(new Daisy(Daisy.Color.WHITE, rand.nextInt(Params.DAISY_MAX_AGE)));
         }
 
+        // Place gray daisies
+        for (int i = 0; i < grayCount && positionIndex < availablePositions.size(); i++, positionIndex++) {
+            int[] pos = availablePositions.get(positionIndex);
+            int x = pos[0];
+            int y = pos[1];
+            grid[x][y].setDaisy(new Daisy(Daisy.Color.GRAY, rand.nextInt(Params.DAISY_MAX_AGE)));
+        }
+
+        // Calculate initial temperatures based on albedo and solar luminosity
+        // This matches NetLogo's approach where temperature is calculated, not set to 0
+        updateTemperatures();
+
         // Print diagnostic information
-        System.out.println("Before initialization completion:");
+        System.out.println("Initialization completed:");
         System.out.println("White daisy albedo: " + Params.WHITE_DAISY_ALBEDO);
         System.out.println("Black daisy albedo: " + Params.BLACK_DAISY_ALBEDO);
+        System.out.println("Gray daisy albedo: " + Params.GRAY_DAISY_ALBEDO);
         System.out.println("Surface albedo: " + Params.SURFACE_ALBEDO);
         System.out.println("Solar luminosity: " + Params.SOLAR_LUMINOSITY);
-        System.out.println("Random sample initial temperature: " + grid[0][0].getTemperature());
-
-        // Update temperature for each Patch after initialization
-        updateTemperatures();
 
         // Print updated temperature
         double totalTemp = 0;
@@ -80,7 +89,7 @@ public class World {
             }
         }
         System.out.println("Average temperature after initialization: " + (totalTemp / count));
-        System.out.println("Random sample updated temperature: " + grid[0][0].getTemperature());
+        System.out.println("Random sample temperature: " + grid[0][0].getTemperature());
     }
 
     // Recalculate temperature for each Patch
