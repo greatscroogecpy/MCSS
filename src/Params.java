@@ -42,6 +42,6 @@ public class Params {
 
     // Simulation parameters
     // Add more simulation parameters as needed
-    public static int MAX_SIMULATION_STEPS = 50; // Quick test
+    public static int MAX_SIMULATION_STEPS = 1000; // Quick test
     public static double DIFFUSION_RATIO = 0.5;
 } 
