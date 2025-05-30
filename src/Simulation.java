@@ -1,19 +1,19 @@
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
 
 // Since all files are in the same package (src), no import is needed
 public class Simulation {
     public static void main(String[] args) {
+
         System.out.println("=== Daisyworld Simulation ===");
         System.out.println("Parameter Settings:");
         System.out.println("  White Daisy Albedo: " + Params.WHITE_DAISY_ALBEDO);
         System.out.println("  Black Daisy Albedo: " + Params.BLACK_DAISY_ALBEDO);
-        System.out.println("  Gray Daisy Albedo: " + Params.GRAY_DAISY_ALBEDO);
         System.out.println("  Surface Albedo: " + Params.SURFACE_ALBEDO);
         System.out.println("  Solar Luminosity: " + Params.SOLAR_LUMINOSITY);
         System.out.println("  Initial White Ratio: " + Params.START_WHITE_RATIO);
         System.out.println("  Initial Black Ratio: " + Params.START_BLACK_RATIO);
-        System.out.println("  Initial Gray Ratio: " + Params.START_GRAY_RATIO);
         System.out.println("  Soil Quality Heterogeneity: " + (Params.ENABLE_SPATIAL_HETEROGENEITY ? "Enabled" : "Disabled"));
         if (Params.ENABLE_SPATIAL_HETEROGENEITY) {
             System.out.println("  Soil Quality Variance: " + Params.SOIL_QUALITY_VARIANCE);
@@ -23,52 +23,45 @@ public class Simulation {
         world.worldInit();
 
         Logger logger = new Logger(world);
+//        logger.printStats(0);
 
-        // Create CSV output
-        try (FileWriter csvWriter = new FileWriter("daisyworld_results.csv")) {
-            csvWriter.append("Step,Temperature,WhiteDaisies,BlackDaisies,GrayDaisies,TotalDaisies,SolarLuminosity\n");
-            
-            // Record initial state (step 0)
-            csvWriter.append(String.format("%d,%.4f,%d,%d,%d,%d,%.4f\n", 
-                0, logger.getAverageTemperature(), logger.getWhiteCount(), 
-                logger.getBlackCount(), logger.getGrayCount(),
-                logger.getWhiteCount() + logger.getBlackCount() + logger.getGrayCount(),
-                Params.SOLAR_LUMINOSITY));
+        // Record initial state (step 0)
+        System.out.println("Initial State (Step 0):");
+        System.out.println("  Average Temperature: " + logger.getAverageTemperature());
+        System.out.println("  White Daisies: " + logger.getWhiteCount());
+        System.out.println("  Black Daisies: " + logger.getBlackCount());
+        System.out.println("  Total Daisies: " + (logger.getWhiteCount() + logger.getBlackCount()));
 
-            // Record initial state (step 0)
-            System.out.println("Initial State (Step 0):");
-            System.out.println("  Average Temperature: " + logger.getAverageTemperature());
-            System.out.println("  White Daisies: " + logger.getWhiteCount());
-            System.out.println("  Black Daisies: " + logger.getBlackCount());
-            System.out.println("  Gray Daisies: " + logger.getGrayCount());
-            System.out.println("  Total Daisies: " + (logger.getWhiteCount() + logger.getBlackCount() + logger.getGrayCount()));
+        // Main simulation loop
+        for (int tick = 1; tick <= Params.MAX_SIMULATION_STEPS; tick++) {
+            world.updateTemperatures();
+            world.diffuseTemperature();
+            world.checkAllDaisySurvivals();
 
-            // Main simulation loop
-            for (int tick = 1; tick <= Params.MAX_SIMULATION_STEPS; tick++) {
-                world.updateTemperatures();
-                world.diffuseTemperature();
-                world.checkAllDaisySurvivals();
-                
-                // Record data to CSV
-                csvWriter.append(String.format("%d,%.4f,%d,%d,%d,%d,%.4f\n", 
-                    tick, logger.getAverageTemperature(), logger.getWhiteCount(), 
-                    logger.getBlackCount(), logger.getGrayCount(),
-                    logger.getWhiteCount() + logger.getBlackCount() + logger.getGrayCount(),
-                    Params.SOLAR_LUMINOSITY));
-                
-                // Print statistics every 10 steps
-                if (tick % 10 == 0) {
-                    logger.printStats(tick);
+            if (Params.SCENARIO == Params.LUMINOSITY_SCENARIO.RAMP_UP_RAMP_DOWN) {
+                if (tick > 200 && tick <= 400) {
+                    Params.SOLAR_LUMINOSITY = roundTo4(Params.SOLAR_LUMINOSITY + 0.005);
+                } else if (tick > 600 && tick <= 850) {
+                    Params.SOLAR_LUMINOSITY = roundTo4(Params.SOLAR_LUMINOSITY - 0.0025);
                 }
+            } else if (Params.SCENARIO == Params.LUMINOSITY_SCENARIO.LOW_SOLAR_LUMINOSITY) {
+                Params.SOLAR_LUMINOSITY = 0.6;
+            } else if (Params.SCENARIO == Params.LUMINOSITY_SCENARIO.OUR_SOLOAR_LUMINOSITY) {
+                Params.SOLAR_LUMINOSITY = 1.0;
+            } else if (Params.SCENARIO == Params.LUMINOSITY_SCENARIO.HIGH_SOLAR_LUMINOSITY) {
+                Params.SOLAR_LUMINOSITY = 1.4;
             }
-
-            System.out.println("Simulation completed!");
-            System.out.println("Results saved to daisyworld_results.csv");
             
-        } catch (IOException e) {
-            System.err.println("Error writing CSV file: " + e.getMessage());
-            System.out.println("Simulation completed (without CSV output)!");
+            // Print statistics every 10 steps
+//            if (tick % 10 == 0) {
+//                logger.printStats(tick);
+//            }
+            logger.printStats(tick);
+
         }
+
+        System.out.println("Simulation completed!");
+        System.out.println("Results can be analyzed from the console output above");
     }
 
     private static double roundTo4(double val) {
