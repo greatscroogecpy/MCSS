@@ -41,6 +41,7 @@ Our implementation adds spatial heterogeneity through soil quality variation:
 - `src/Daisy.java`: Daisy entity with age and color properties
 - `src/Logger.java`: Data collection and statistics
 - `src/Params.java`: Centralized parameter configuration
+- `src/QuickExperiments.java`: Experiment the extension of the model
 
 ## Parameters
 

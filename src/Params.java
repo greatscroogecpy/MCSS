@@ -34,7 +34,7 @@ public class Params {
         MAINTAIN_CURRENT_LUMINOSITY
     }
 
-    public static LUMINOSITY_SCENARIO SCENARIO =LUMINOSITY_SCENARIO.LOW_SOLAR_LUMINOSITY;
+    public static LUMINOSITY_SCENARIO SCENARIO =LUMINOSITY_SCENARIO.HIGH_SOLAR_LUMINOSITY;
 
     // Spatial Heterogeneity parameters
     public static boolean ENABLE_SPATIAL_HETEROGENEITY = false;
