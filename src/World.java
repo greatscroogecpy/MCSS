@@ -7,6 +7,9 @@ public class World {
     private final double diffusionRatio = 0.5;
     private static final Random rand = new Random();
 
+    // Silent mode to suppress output during batch experiments
+    public static boolean SILENT_MODE = false;
+
     public World() {
         this.size = Params.WORLD_SIZE;
         this.grid = new Patch[size][size];
@@ -71,25 +74,27 @@ public class World {
         // This matches NetLogo's approach where temperature is calculated, not set to 0
         updateTemperatures();
 
-//        // Print diagnostic information
-//        System.out.println("Initialization completed:");
-//        System.out.println("White daisy albedo: " + Params.WHITE_DAISY_ALBEDO);
-//        System.out.println("Black daisy albedo: " + Params.BLACK_DAISY_ALBEDO);
-//        System.out.println("Gray daisy albedo: " + Params.GRAY_DAISY_ALBEDO);
-//        System.out.println("Surface albedo: " + Params.SURFACE_ALBEDO);
-//        System.out.println("Solar luminosity: " + Params.SOLAR_LUMINOSITY);
+        // Print diagnostic information only if not in silent mode
+        if (!SILENT_MODE) {
+            System.out.println("Initialization completed:");
+            System.out.println("White daisy albedo: " + Params.WHITE_DAISY_ALBEDO);
+            System.out.println("Black daisy albedo: " + Params.BLACK_DAISY_ALBEDO);
+            System.out.println("Gray daisy albedo: " + Params.GRAY_DAISY_ALBEDO);
+            System.out.println("Surface albedo: " + Params.SURFACE_ALBEDO);
+            System.out.println("Solar luminosity: " + Params.SOLAR_LUMINOSITY);
 
-        // Print updated temperature
-        double totalTemp = 0;
-        int count = 0;
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                totalTemp += grid[i][j].getTemperature();
-                count++;
+            // Print updated temperature
+            double totalTemp = 0;
+            int count = 0;
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    totalTemp += grid[i][j].getTemperature();
+                    count++;
+                }
             }
+            System.out.println("Average temperature after initialization: " + (totalTemp / count));
+            System.out.println("Random sample temperature: " + grid[0][0].getTemperature());
         }
-//        System.out.println("Average temperature after initialization: " + (totalTemp / count));
-//        System.out.println("Random sample temperature: " + grid[0][0].getTemperature());
     }
 
     // Recalculate temperature for each Patch

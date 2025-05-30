@@ -17,25 +17,7 @@ import java.util.*;
 
         public Logger(World world) {
             this.world = world;
-
-            try {
-                csvWriter = new FileWriter("daisyworld_output.csv");
-                csvWriter.append("Tick,AverageTemperature,WhiteCount,BlackCount,TotalCount,SolarLuminosity\n");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
-
-        public void closeCSV() {
-            try {
-                csvWriter.flush();
-                csvWriter.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-
 
         public int getWhiteCount() {
             int count = 0;
@@ -59,6 +41,17 @@ import java.util.*;
             return count;
         }
 
+        public int getGrayCount() {
+            int count = 0;
+            for (int i = 0; i < world.getSize(); i++)
+                for (int j = 0; j < world.getSize(); j++) {
+                    Daisy d = world.getGrid()[i][j].getDaisy();
+                    if (d != null && d.getColor() == Daisy.Color.GRAY)
+                        count++;
+                }
+            return count;
+        }
+
         public double getAverageTemperature() {
             double sum = 0.0;
             int size = world.getSize();
@@ -76,30 +69,6 @@ import java.util.*;
             blackCounts.add(getBlackCount());
         }
 
-        public void printStats(int tick) {
-            double avgTemp = getAverageTemperature();
-            int whiteCount = getWhiteCount();
-            int blackCount = getBlackCount();
-            int totalCount = whiteCount + blackCount;
-            double luminosity = Params.SOLAR_LUMINOSITY;
-
-            // 控制台输出
-            System.out.printf("Step %d - Temp: %.2f, White: %d, Black: %d, Total: %d, Luminosity: %.4f\n",
-                    tick, avgTemp, whiteCount, blackCount, totalCount, luminosity);
-
-            // 写入CSV
-            try {
-                csvWriter.append(String.format("%d,%.4f,%d,%d,%d,%.4f\n",
-                        tick, avgTemp, whiteCount, blackCount, totalCount, luminosity));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public List<Integer> getTicks() {
-            return ticks;
-        }
-
         public List<Double> getTemperatures() {
             return temperatures;
         }
@@ -113,6 +82,10 @@ import java.util.*;
         }
 
 
+        /***
+         * When running locally, we used xChart to generate plots and compare the results.
+         * However, since xChart is an external library, we removed it from the final version of the code.
+         */
 //        public static void displayCharts(List<Integer> ticks,
 //                                         List<Double> avgTemperatures,
 //                                         List<Integer> avgWhiteCounts,
